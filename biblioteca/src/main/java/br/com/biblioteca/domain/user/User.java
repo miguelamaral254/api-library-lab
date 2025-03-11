@@ -2,6 +2,9 @@ package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BaseEntity;
 import br.com.biblioteca.domain.phone.Phone;
+import br.com.biblioteca.domain.user.enums.Course;
+import br.com.biblioteca.domain.user.enums.Institution;
+import br.com.biblioteca.domain.user.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +37,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Email(message = "Email com formato inválido")
     private String email;
+
+    Institution institution;
+    Course course;
 
     @NotBlank
     @Column(nullable = false)
