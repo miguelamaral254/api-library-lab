@@ -1,7 +1,7 @@
 package br.com.biblioteca.domain.authentication;
 
-import br.com.biblioteca.domain.errors.exceptions.BusinessException;
-import br.com.biblioteca.domain.errors.exceptions.GeneralExceptionCodeEnum;
+import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.core.GeneralExceptionCodeEnum;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;

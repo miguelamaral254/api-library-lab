@@ -1,7 +1,7 @@
 package br.com.biblioteca.domain.user;
 
-import br.com.biblioteca.domain.errors.exceptions.BusinessException;
-import br.com.biblioteca.domain.errors.exceptions.UserExceptionCodeEnum;
+import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.domain.phone.Phone;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

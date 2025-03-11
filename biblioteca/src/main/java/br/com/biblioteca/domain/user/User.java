@@ -2,6 +2,9 @@ package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BaseEntity;
 import br.com.biblioteca.domain.phone.Phone;
+import br.com.biblioteca.domain.user.enums.Course;
+import br.com.biblioteca.domain.user.enums.Institution;
+import br.com.biblioteca.domain.user.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -40,12 +43,22 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Phone> phones;
+    @NotBlank
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Course course;
+
+    @NotBlank
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Institution institution;
 
     @NotNull
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Phone> phones;
 
     public void validateDocument() {
         if (role != null) {
