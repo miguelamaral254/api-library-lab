@@ -13,7 +13,7 @@ public enum UserExceptionCodeEnum implements ExceptionCode {
     DUPLICATE_USER("Duplicate user found", "USEREXCEP-409", 409),
     DUPLICATE_EMAIL("Duplicate email", "USEREXCEP-409", 409),
     INVALID_EMAIL("Invalid email format or missing", "USEREXCEP-400", 400),
-    INVALID_PASSWORD("Invalid password format or missing", "USEREXCEP-400", 400), // Atualizado para 005
+    INVALID_PASSWORD("Invalid password format or missing", "USEREXCEP-400", 400),
     DUPLICATE_CPF("CPF already exists", "USEREXCEP-409", 409),
     INVALID_CPF("Invalid CPF format", "USEREXCEP-400", 400),
     EMAIL_DOES_NOT_MATCH("Email does not match", "USEREXCEP-404", 404),
