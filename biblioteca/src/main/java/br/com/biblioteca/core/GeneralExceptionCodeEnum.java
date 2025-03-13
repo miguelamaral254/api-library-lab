@@ -1,9 +1,9 @@
-package br.com.biblioteca.domain.errors.exceptions;
+package br.com.biblioteca.core;
 
 import lombok.Getter;
 
 @Getter
-public enum GeneralExceptionCodeEnum {
+public enum GeneralExceptionCodeEnum implements ExceptionCode {
 
     SERVER_ERROR("Internal server error", "ERR-500", 500),
     INVALID_TOKEN("Invalid token", "ERR-401", 401),
