@@ -21,9 +21,6 @@ public record UserDTO(
         @NotBlank(groups = CreateValidation.class)
         String name,
 
-        @NotBlank(groups = CreateValidation.class)
-        String registration,
-
         @NotNull(groups = CreateValidation.class)
         @Enumerated(EnumType.STRING)
         Role role,
