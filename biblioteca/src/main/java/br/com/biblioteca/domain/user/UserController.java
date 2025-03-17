@@ -54,6 +54,9 @@ public class UserController {
             @RequestParam(value = "role", required = false) String role,
             @RequestParam(value = "cpf", required = false) String cpf,
             @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "institution", required = false) String institution,
+            @RequestParam(value = "course", required = false) String course,
+
             @RequestParam(value = "enabled", required = false) Boolean enabled,
             Pageable pageable) {
 
@@ -70,6 +73,14 @@ public class UserController {
         if (email != null) {
             specification = specification.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
+        }
+        if (institution != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("institution")), "%" + institution.toLowerCase() + "%"));
+        }
+        if (course != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("course")), "%" + course.toLowerCase() + "%"));
         }
         if (enabled != null) {
             specification = specification.and((root, query, criteriaBuilder) ->
