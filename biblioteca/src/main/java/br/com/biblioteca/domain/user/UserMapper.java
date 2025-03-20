@@ -3,7 +3,6 @@ package br.com.biblioteca.domain.user;
 import br.com.biblioteca.core.BaseMapper;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
