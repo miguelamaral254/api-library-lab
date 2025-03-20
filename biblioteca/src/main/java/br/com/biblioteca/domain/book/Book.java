@@ -37,7 +37,6 @@ public class Book extends BaseEntity {
     private Boolean available;
 
 
-
     protected void onCreate() {
         super.onCreate();
         if (this.available == null) {

@@ -10,7 +10,9 @@ public class RoutesConfig {
             "/projects/**",
             "/editals/**",
             "/users/**",
-            "/books/**"
+            "/books/**",
+            "/book-artifacts/**"
+
 
     };
     public static final String[] USER_ROUTES = {
