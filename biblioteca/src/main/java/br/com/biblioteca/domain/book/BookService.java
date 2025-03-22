@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.function.Consumer;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -19,6 +21,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final BookMapper bookMapper;
 
     @Transactional
     public Book createBook(Book book) {
@@ -52,39 +55,55 @@ public class BookService {
         return bookRepository.findAll(specification, pageable);
     }
 
-    @Transactional
-    public Book updateBook(Long id, Book bookUpdates) {
-        Book existingBook = findById(id);
-        validateUpdateRules(existingBook, bookUpdates);
-        return bookRepository.save(existingBook);
-    }
 
-    private void validateUpdateRules(Book existingBook, Book bookUpdates) {
-        if (bookUpdates.getTitle() != null) {
-            existingBook.setTitle(bookUpdates.getTitle());
-        }
-        if (bookUpdates.getAvailable() != null) {
-            existingBook.setAvailable(bookUpdates.getAvailable());
-        }
-        if (bookUpdates.getEnabled() != null) {
-            existingBook.setEnabled(bookUpdates.getEnabled());
-        }
-        if (bookUpdates.getDescription() != null) {
-            existingBook.setDescription(bookUpdates.getDescription());
-        }
-        if (bookUpdates.getGender() != null) {
-            existingBook.setGender(bookUpdates.getGender());
-        }
-        if (bookUpdates.getUserId() != null) {
-            existingBook.setUserId(bookUpdates.getUserId());
-        }
+    @Transactional
+    public Book updateBook(Long id, BookDTO bookDtoUpdates) {
+        Book existingBook = findById(id);
+        bookMapper.mergeNonNull(bookDtoUpdates, existingBook);
+
+        validateUpdateBusiness(existingBook);
+
+        return bookRepository.save(existingBook);
     }
 
     @Transactional
     public Book updateAvailability(Long id, Boolean available) {
         Book book = findById(id);
         book.setAvailable(available);
+
+        validateUpdateBusiness(book);
+
         return bookRepository.save(book);
+    }
+
+    private void validateUpdateBusiness(Book book) {
+        if (book == null) {
+            throw new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND);
+        }
+
+        if (book.getAvailable() == null) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+        }
+
+        if (!book.getAvailable().equals(Boolean.TRUE) && !book.getAvailable().equals(Boolean.FALSE)) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+        }
+
+        if (book.getTitle() == null || book.getTitle().isEmpty()) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_TITLE);
+        }
+
+        if (book.getUserId() == null) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
+        }
+
+        if (book.getEnabled() == null) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_ENABLED_STATUS);
+        }
+
+        if (book.getGender() == null || !Enum.valueOf(Gender.class, book.getGender().name()).equals(book.getGender())) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+        }
     }
 
     @Transactional

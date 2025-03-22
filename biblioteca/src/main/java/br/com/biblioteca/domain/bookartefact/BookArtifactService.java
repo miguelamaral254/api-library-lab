@@ -24,11 +24,15 @@ public class BookArtifactService {
 
     @Transactional
     public BookArtifact createArtifact(Long bookId, BookArtifact artifact) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
+        Book book = validateBusinessRules(bookId);
 
         artifact.setBookId(book);
         return bookArtifactRepository.save(artifact);
+    }
+
+    private Book validateBusinessRules(Long bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

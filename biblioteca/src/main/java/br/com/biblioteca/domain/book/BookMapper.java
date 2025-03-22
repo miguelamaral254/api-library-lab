@@ -1,13 +1,11 @@
 package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.domain.user.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import br.com.biblioteca.core.BaseMapper;
 
 @Mapper(componentModel = "spring")
 public interface BookMapper extends BaseMapper<Book, BookDTO> {
-
 
     @Mapping(source = "userId", target = "userId")
     BookDTO toDTO(Book book);
@@ -15,6 +13,11 @@ public interface BookMapper extends BaseMapper<Book, BookDTO> {
     @Override
     @Mapping(source = "userId", target = "userId")
     Book toEntity(BookDTO bookDTO);
+
+    @Override
+    @Mapping(source = "userId", target = "userId")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void mergeNonNull(BookDTO dto, @MappingTarget Book entity);
 
     default Long map(User user) {
         if (user == null) {

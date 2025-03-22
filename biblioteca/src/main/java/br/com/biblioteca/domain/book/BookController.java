@@ -2,6 +2,7 @@ package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.ApplicationResponse;
 import br.com.biblioteca.validations.groups.CreateValidation;
+import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -93,16 +94,13 @@ public class BookController {
                 .status(HttpStatus.OK)
                 .body(ApplicationResponse.ofSuccess(bookDTO));
     }
-
-    @Tag(name = "Update Book")
-    @Operation(summary = "Update an existing book")
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing book")
     public ResponseEntity<ApplicationResponse<BookDTO>> updateBook(
             @PathVariable Long id,
-            @RequestBody BookDTO bookDto) {
+            @Validated(UpdateValidation.class) @RequestBody BookDTO bookDtoUpdates) {
 
-        Book book = bookMapper.toEntity(bookDto);
-        Book updatedBook = bookService.updateBook(id, book);
+        Book updatedBook = bookService.updateBook(id, bookDtoUpdates);
         BookDTO updatedBookDto = bookMapper.toDto(updatedBook);
 
         return ResponseEntity
