@@ -3,7 +3,6 @@ package br.com.biblioteca.domain.book;
 import br.com.biblioteca.core.BusinessException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.UserService;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,14 +11,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
 
