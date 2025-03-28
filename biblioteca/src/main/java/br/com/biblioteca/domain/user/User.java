@@ -34,27 +34,22 @@ public class User extends BaseEntity {
     private String cpf;
 
     @NotBlank
-    @Column(nullable = false)
     @Email(message = "Email com formato inválido")
     private String email;
 
     @NotBlank
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @NotBlank
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Course course;
 
     @NotBlank
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Institution institution;
 
     @NotNull
-    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

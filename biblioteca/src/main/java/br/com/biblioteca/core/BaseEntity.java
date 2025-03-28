@@ -1,6 +1,5 @@
 package br.com.biblioteca.core;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,12 +31,11 @@ public abstract class BaseEntity {
         LocalDateTime now = LocalDateTime.now();
         this.createdDate = now;
         this.lastModifiedDate = now;
+        this.enabled = true;
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.lastModifiedDate = LocalDateTime.now();
     }
-
-
 }

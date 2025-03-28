@@ -1,0 +1,14 @@
+package br.com.biblioteca.domain.book;
+
+public enum Gender {
+    FICCAO_CIENTIFICA,
+    ROMANCE,
+    MISTERIO_SUSPENSE,
+    FANTASIA,
+    TERROR,
+    AVENTURA,
+    TECNOLOGIA_INOVACAO,
+    DESENVOLVIMENTO_SOFTWARE,
+    SEGURANCA_INFORMACAO,
+    EMPREENDEDORISMO_TECNOLOGIA;
+}
