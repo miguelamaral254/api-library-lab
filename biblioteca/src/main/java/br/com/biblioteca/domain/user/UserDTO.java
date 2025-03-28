@@ -3,6 +3,7 @@ package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BaseDTO;
 import br.com.biblioteca.domain.phone.Phone;
+import br.com.biblioteca.domain.phone.PhoneDTO;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
@@ -25,7 +26,7 @@ public record UserDTO(
         @Enumerated(EnumType.STRING)
         Role role,
 
-        List<Phone> phones,
+        List<PhoneDTO> phones,
 
         @NotBlank(groups = CreateValidation.class)
         @Email(message = "Email com formato inválido")

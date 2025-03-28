@@ -1,9 +1,10 @@
 package br.com.biblioteca.domain.user.enums;
 
 import br.com.biblioteca.core.ExceptionCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
+@AllArgsConstructor
 @Getter
 public enum UserExceptionCodeEnum implements ExceptionCode {
 
@@ -18,13 +19,9 @@ public enum UserExceptionCodeEnum implements ExceptionCode {
     IMAGE_SIZE_EXCEEDED("The image size exceeds the maximum limit of 5MB.", "USEREXCEP-012", 400);
 
 
+
     private final String message;
     private final String code;
     private final int httpStatus;
 
-    UserExceptionCodeEnum(String message, String code, int httpStatus) {
-        this.message = message;
-        this.code = code;
-        this.httpStatus = httpStatus;
-    }
 }
