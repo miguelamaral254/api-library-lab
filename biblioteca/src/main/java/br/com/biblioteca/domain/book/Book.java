@@ -22,8 +22,9 @@ public class Book extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User userId;
-    //TODO: IMPLEMENTAR FOTO DE CAPA
-    //private String urlImage;
+
+    @NotBlank
+    private String urlImage;
 
     @NotBlank
     private String title;

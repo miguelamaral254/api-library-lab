@@ -9,5 +9,5 @@ public interface BaseDTO {
     LocalDateTime createdDate();
 
     LocalDateTime lastModifiedDate();
-
+    //TODO IMPLEMENTAR ENABLED
 }

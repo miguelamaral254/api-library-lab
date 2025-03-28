@@ -56,7 +56,6 @@ public class UserController {
             @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "institution", required = false) String institution,
             @RequestParam(value = "course", required = false) String course,
-
             @RequestParam(value = "enabled", required = false) Boolean enabled,
             Pageable pageable) {
 

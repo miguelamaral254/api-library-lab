@@ -15,7 +15,8 @@ public enum BookExceptionCodeEnum implements ExceptionCode {
     USER_NOT_FOUND("User not found", "USEREXCEP-404", 404),
     INVALID_AVAILABILITY_STATUS("Invalid availability status", "BOOKEXCEP-400", 400),
     INVALID_ENABLED_STATUS("Invalid enabled status", "BOOKEXCEP-400", 400),
-    INVALID_BOOK_GENDER("Invalid book gender", "BOOKEXCEP-400", 400);
+    INVALID_BOOK_GENDER("Invalid book gender", "BOOKEXCEP-400", 400),
+    IMAGE_CREATION_FAILED("Image creation failed", "BOOKEXCEP-400", 400),;
 
 
     private final String message;

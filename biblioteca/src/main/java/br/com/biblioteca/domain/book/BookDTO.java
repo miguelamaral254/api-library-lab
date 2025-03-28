@@ -15,6 +15,9 @@ public record BookDTO(
         Long id,
 
         @NotBlank
+        String urlImage,
+
+        @NotBlank
         String title,
 
         @NotNull

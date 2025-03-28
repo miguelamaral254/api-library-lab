@@ -1,10 +1,10 @@
 package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.ApplicationResponse;
-import br.com.biblioteca.validations.groups.CreateValidation;
 import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Tag(name = "Book")
@@ -26,18 +28,21 @@ public class BookController {
     private final BookService bookService;
     private final BookMapper bookMapper;
 
-    @Tag(name="Create Book")
-    @PostMapping
-    @Operation(summary = "Create a new book")
+    @Tag(name = "Create Opportunity")
+    @Operation(summary = "Create a new opportunity")
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<Void> createBook(
-            @Validated(CreateValidation.class)
-            @RequestBody BookDTO bookDto) {
+            @RequestPart("dto") BookDTO bookDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest request) throws IOException {
+
         Book book = bookMapper.toEntity(bookDto);
-        Book savedEntity = bookService.createBook(book);
+        Book savedBook = bookService.createBook(book, file, request);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(savedEntity.getId())
+                .buildAndExpand(savedBook.getId())
                 .toUri();
 
         return ResponseEntity
