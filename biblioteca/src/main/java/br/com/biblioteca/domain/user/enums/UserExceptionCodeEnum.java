@@ -24,8 +24,6 @@ public enum UserExceptionCodeEnum implements ExceptionCode {
     FILE_UPLOAD_FAILED("Failed to upload", "USEREXCEP-011", 400),
     IMAGE_SIZE_EXCEEDED("The image size exceeds the maximum limit of 5MB.", "USEREXCEP-012", 400);
 
-
-
     private final String message;
     private final String code;
     private final int httpStatus;

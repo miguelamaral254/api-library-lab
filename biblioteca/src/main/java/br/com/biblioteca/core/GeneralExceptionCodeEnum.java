@@ -18,4 +18,17 @@ public enum GeneralExceptionCodeEnum implements ExceptionCode {
         this.code = code;
         this.httpStatus = httpStatus;
     }
+
+    @Override
+    public int getHttpStatus() {
+        return this.httpStatus;  // Implementa o método exigido pela interface
+    }
+    @Override
+    public String getMessage() {
+        return this.message;  // Implementa o método exigido pela interface
+    }
+    @Override
+    public String getCode() {
+        return this.code;  // Implementa o método exigido pela interface
+    }
 }

@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 
     boolean existsByEmail(@NotBlank @Email(message = "Email com formato inválido") String email);
+
+    boolean existsByEmailAndIdNot(@NotBlank @Email String email, Long id);
+
+    boolean existsByCpfAndIdNot(String cpf, Long id);
 }

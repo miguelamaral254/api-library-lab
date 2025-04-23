@@ -3,6 +3,7 @@ package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.ApplicationResponse;
 import br.com.biblioteca.validations.groups.CreateValidation;
+import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,7 +54,7 @@ public class UserController {
                 .build();
     }
 
-    @Tag(name="Search Users with filter")
+    @Tag(name = "Search Users with filter")
     @GetMapping
     @Operation(summary = "Search users with filters or all users")
     public ResponseEntity<ApplicationResponse<Page<UserDTO>>> searchUsers(
@@ -105,25 +106,23 @@ public class UserController {
     public ResponseEntity<ApplicationResponse<UserDTO>> findById(
             @PathVariable Long id
     ) {
-            User user = userService.findById(id);
-            UserDTO userDTO = userMapper.toDto(user);
+        User user = userService.findById(id);
+        UserDTO userDTO = userMapper.toDto(user);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApplicationResponse.ofSuccess(userDTO));
     }
 
-    @Tag(name = "Update User")
-    @Operation(summary = "Update an existing user")
+
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing user")
     public ResponseEntity<ApplicationResponse<UserDTO>> updateUser(
             @PathVariable Long id,
-            @RequestBody UserDTO userDto) {
-
-        User user = userMapper.toEntity(userDto);
-        User updatedUser = userService.updateUser(id, user);
-        UserDTO updatedUserDto = userMapper.toDto(updatedUser);
-
+            @Validated(UpdateValidation.class)
+            @RequestBody UserDTO userDtoUpdates) {
+        User userUpdated = userService.updateUser(id, user -> userMapper.mergeNonNull(userDtoUpdates, user));
+        UserDTO updatedUserDto = userMapper.toDto(userUpdated);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApplicationResponse.ofSuccess(updatedUserDto));
@@ -145,15 +144,5 @@ public class UserController {
                 .body(ApplicationResponse.ofSuccess(updatedUser.getEnabled().toString()));
     }
 
-
-    @Tag(name = "Delete User")
-    @Operation(summary = "Delete a User by ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
-    }
 }
 

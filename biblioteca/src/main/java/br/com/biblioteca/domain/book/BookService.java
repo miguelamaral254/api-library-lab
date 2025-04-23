@@ -113,9 +113,7 @@ public class BookService {
             throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
         }
 
-        if (book.getEnabled() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_ENABLED_STATUS);
-        }
+
 
         if (book.getGender() == null || !Enum.valueOf(Gender.class, book.getGender().name()).equals(book.getGender())) {
             throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);

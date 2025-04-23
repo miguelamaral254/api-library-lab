@@ -1,13 +1,11 @@
 package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BusinessException;
-import br.com.biblioteca.domain.book.Book;
 import br.com.biblioteca.domain.book.BookExceptionCodeEnum;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.domain.phone.Phone;
 import br.com.biblioteca.infrastructure.conf.ImageConf;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +31,7 @@ public class UserService {
     @Transactional
     public User createUser(User user, MultipartFile file, HttpServletRequest request) {
         validateImageCreateRules(user, file, request);
+        validateBusinessRules(user);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -47,23 +47,24 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
     }
-
     @Transactional
-    public User updateUser(Long id, User updatedUser) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
-
-        validateUpdateRules(existingUser.getName(), updatedUser);
-        updateUserFields(existingUser, updatedUser);
-        managePhones(existingUser, updatedUser);
-
-        return userRepository.save(existingUser);
+    public User updateUser(Long id, Consumer<User> mergeNonNull) {
+        User user = findById(id);
+        final String oldEmail = user.getEmail();
+        final String oldCpf = user.getCpf();
+        mergeNonNull.accept(user);
+        validateUpdate(user, oldEmail, oldCpf);
+        return userRepository.save(user);
     }
 
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = findById(id);
-        userRepository.delete(user);
+    private void validateUpdate(User user, String oldEmail, String oldCpf) {
+        if (!oldEmail.equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
+        }
+
+        if (!oldCpf.equals(user.getCpf()) && userRepository.existsByCpfAndIdNot(user.getCpf(), user.getId())) {
+            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_USER);
+        }
     }
 
     @Transactional
@@ -122,47 +123,11 @@ public class UserService {
             throw new BusinessException(UserExceptionCodeEnum.INVALID_ROLE);
         }
 
-        if (user.getPhones() == null || user.getPhones().isEmpty()) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_PHONE);
-        }
-    }
-    private void validateUpdateRules(String oldUserName, User updatedUser) {
-        validateBusinessRules(updatedUser);
-        if (!oldUserName.equals(updatedUser.getName()) &&
-                userRepository.existsByNameAndIdNot(updatedUser.getName(), updatedUser.getId())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_USER);
-        }
-        if (!updatedUser.getEmail().equals(updatedUser.getEmail()) &&
-                userRepository.existsByEmail(updatedUser.getEmail())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
-        }
-        if (updatedUser.getCpf() != null && !updatedUser.getCpf().equals(updatedUser.getCpf()) &&
-                userRepository.existsByCpf(updatedUser.getCpf())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_CPF);
-        }
-    }
-
-    private void updateUserFields(User existingUser, User updatedUser) {
-        if (updatedUser.getName() != null) {
-            existingUser.setName(updatedUser.getName());
-        }
-        if (updatedUser.getEmail() != null) {
-            existingUser.setEmail(updatedUser.getEmail());
-        }
-        if (updatedUser.getPassword() != null) {
-            existingUser.setPassword(updatedUser.getPassword());
-        }
-        if (updatedUser.getEnabled() != null) {
-            existingUser.setEnabled(updatedUser.getEnabled());
-        }
-        if (updatedUser.getCpf() != null) {
-            existingUser.setCpf(updatedUser.getCpf());
-        }
     }
 
     private void validateImageCreateRules(User user, MultipartFile file, HttpServletRequest request) {
         try {
-            validateBusinessRules(user);
+
 
             if (file != null && !file.isEmpty()) {
                 String urlImage = imageConf.saveImage(file, request);
@@ -174,21 +139,4 @@ public class UserService {
         }
     }
 
-    private void managePhones(User existingUser, User updatedUser) {
-        if (updatedUser.getPhones() != null) {
-            for (Phone phone : updatedUser.getPhones()) {
-                if (phone.getId() == null) {
-                    phone.setUser(existingUser);
-                    existingUser.getPhones().add(phone);
-                } else {
-                    for (Phone existingPhone : existingUser.getPhones()) {
-                        if (existingPhone.getId().equals(phone.getId())) {
-                            existingPhone.setNumber(phone.getNumber());
-                            existingPhone.setCountryCode(phone.getCountryCode());
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
