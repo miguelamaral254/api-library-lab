@@ -60,6 +60,7 @@ public class BookService {
             throw new BusinessException(BookExceptionCodeEnum.IMAGE_CREATION_FAILED);
         }
     }
+
     @Transactional(readOnly = true)
     public Book findById(Long id) {
         return bookRepository.findById(id)
@@ -78,8 +79,6 @@ public class BookService {
         bookMapper.mergeNonNull(bookDtoUpdates, existingBook);
 
         validateUpdateBusiness(existingBook);
-        System.out.println("Gender before update: " + existingBook.getGender());
-        System.out.println("Gender from DTO: " + bookDtoUpdates.gender());
         return bookRepository.save(existingBook);
     }
 

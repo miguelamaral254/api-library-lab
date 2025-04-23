@@ -36,9 +36,7 @@ public class Book extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false)
     private Boolean available;
-
 
     protected void onCreate() {
         super.onCreate();

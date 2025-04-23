@@ -1,11 +1,15 @@
 package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.book.Book;
+import br.com.biblioteca.domain.book.BookExceptionCodeEnum;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.domain.phone.Phone;
+import br.com.biblioteca.infrastructure.conf.ImageConf;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +17,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Service
@@ -21,10 +27,12 @@ import java.util.Arrays;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageConf imageConf;
 
     @Transactional
-    public User createUser(User user) {
-        validateBusinessRules(user);
+    public User createUser(User user, MultipartFile file, HttpServletRequest request) {
+        validateImageCreateRules(user, file, request);
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -149,6 +157,20 @@ public class UserService {
         }
         if (updatedUser.getCpf() != null) {
             existingUser.setCpf(updatedUser.getCpf());
+        }
+    }
+
+    private void validateImageCreateRules(User user, MultipartFile file, HttpServletRequest request) {
+        try {
+            validateBusinessRules(user);
+
+            if (file != null && !file.isEmpty()) {
+                String urlImage = imageConf.saveImage(file, request);
+                user.setImageUrl(urlImage);
+            }
+
+        } catch (IOException e) {
+            throw new BusinessException(BookExceptionCodeEnum.IMAGE_CREATION_FAILED);
         }
     }
 

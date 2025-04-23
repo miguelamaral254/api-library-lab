@@ -15,6 +15,12 @@ public enum UserExceptionCodeEnum implements ExceptionCode {
     INVALID_PASSWORD("Invalid password format or missing", "USEREXCEP-005", 400),
     DUPLICATE_CPF("CPF already exists", "USEREXCEP-007", 409),
     EMAIL_DOES_NOT_MATCH("Email does not match", "USEREXCEP-010", 409),
+    INVALID_NAME("Name cannot be empty or contain invalid characters", "USEREXCEP-400", 400),
+    INVALID_CPF("Invalid CPF format", "USEREXCEP-400", 400),
+    INVALID_ROLE("Invalid role or does not exists", "USEREXCEP-400", 400),
+    INVALID_INSTITUTION("Invalid institution or does not exists", "USEREXCEP-404", 404),
+    INVALID_COURSE("Invalid course or does not exists", "USEREXCEP-404", 404),
+    INVALID_PHONE("Invalid phone format", "USEREXCEP-400", 400),
     FILE_UPLOAD_FAILED("Failed to upload", "USEREXCEP-011", 400),
     IMAGE_SIZE_EXCEEDED("The image size exceeds the maximum limit of 5MB.", "USEREXCEP-012", 400);
 

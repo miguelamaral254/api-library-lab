@@ -19,6 +19,9 @@ public record UserDTO(
         @Null
         Long id,
 
+        @NotBlank(groups = {CreateValidation.class})
+        String imageUrl,
+
         @NotBlank(groups = CreateValidation.class)
         String name,
 

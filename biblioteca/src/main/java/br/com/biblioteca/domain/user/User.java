@@ -29,6 +29,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @NotBlank
+    private String imageUrl;
+
     @Pattern(regexp = "\\d{11}", message = "CPF deve ter 11 dígitos")
     @Column(unique = true)
     private String cpf;

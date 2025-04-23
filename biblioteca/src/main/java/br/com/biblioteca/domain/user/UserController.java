@@ -5,6 +5,7 @@ import br.com.biblioteca.core.ApplicationResponse;
 import br.com.biblioteca.validations.groups.CreateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 
+import java.io.IOException;
 import java.net.URI;
 
 @Tag(name = "User")
@@ -27,25 +30,28 @@ public class UserController {
     private final UserMapper userMapper;
 
 
-        @Tag(name="Create User")
-        @PostMapping
-        @Operation(summary = "Create a new user")
-        public ResponseEntity<Void> createUser(
-                @Validated(CreateValidation.class)
-                @RequestBody UserDTO userDto) {
-            User user = userMapper.toEntity(userDto);
-            User savedEntity = userService.createUser(user);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(savedEntity.getId())
-                    .toUri();
+    @Tag(name = "Create User")
+    @Operation(summary = "Create a new user")
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<Void> createUser(
+            @RequestPart("dto") UserDTO userDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpServletRequest request) throws IOException {
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .location(location)
-                    .build();
-        }
+        User user = userMapper.toEntity(userDto);
+        User savedEntity = userService.createUser(user, file, request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedEntity.getId())
+                .toUri();
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .location(location)
+                .build();
+    }
 
     @Tag(name="Search Users with filter")
     @GetMapping
