@@ -28,8 +28,8 @@ public class BookController {
     private final BookService bookService;
     private final BookMapper bookMapper;
 
-    @Tag(name = "Create Opportunity")
-    @Operation(summary = "Create a new opportunity")
+    @Tag(name = "Create Book")
+    @Operation(summary = "Create a new book")
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<Void> createBook(
             @RequestPart("dto") BookDTO bookDto,

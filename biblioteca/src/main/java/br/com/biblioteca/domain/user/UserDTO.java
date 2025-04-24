@@ -1,23 +1,21 @@
 package br.com.biblioteca.domain.user;
 
-
 import br.com.biblioteca.core.BaseDTO;
-import br.com.biblioteca.domain.phone.Phone;
-import br.com.biblioteca.domain.phone.PhoneDTO;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
 import br.com.biblioteca.validations.groups.CreateValidation;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record UserDTO(
 
         @Null
         Long id,
+
+        @NotBlank(groups = {CreateValidation.class})
+        String imageUrl,
 
         @NotBlank(groups = CreateValidation.class)
         String name,
@@ -26,20 +24,21 @@ public record UserDTO(
         @Enumerated(EnumType.STRING)
         Role role,
 
-        List<PhoneDTO> phones,
+        @NotBlank(groups = CreateValidation.class)
+        String number,
 
         @NotBlank(groups = CreateValidation.class)
-        @Email(message = "Email com formato inválido")
+        String countryCode,
+
+        @Email
+        @NotBlank(groups = CreateValidation.class)
         String email,
 
         @NotBlank(groups = CreateValidation.class)
         String password,
 
-        @Null
-        Boolean enabled,
-
-        @NotNull(groups = CreateValidation.class)
         @Pattern(regexp = "\\d{11}", message = "CPF deve ter 11 dígitos")
+        @NotNull(groups = CreateValidation.class)
         String cpf,
 
         @NotNull(groups = CreateValidation.class)
@@ -47,6 +46,9 @@ public record UserDTO(
 
         @NotNull(groups = CreateValidation.class)
         Course course,
+
+        @Null
+        Boolean enabled,
 
         @Null
         LocalDateTime createdDate,
