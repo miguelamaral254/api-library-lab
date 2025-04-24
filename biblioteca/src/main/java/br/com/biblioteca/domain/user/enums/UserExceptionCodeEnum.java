@@ -14,7 +14,7 @@ public enum UserExceptionCodeEnum implements ExceptionCode {
     INVALID_EMAIL("Invalid email format or missing", "USEREXCEP-004", 400),
     INVALID_PASSWORD("Invalid password format or missing", "USEREXCEP-005", 400),
     DUPLICATE_CPF("CPF already exists", "USEREXCEP-007", 409),
-    EMAIL_DOES_NOT_MATCH("Email does not match", "USEREXCEP-010", 409),
+    EMAIL_AND_PASSWORD_DOES_NOT_MATCH("Email and Password does not match", "USEREXCEP-010", 409),
     INVALID_NAME("Name cannot be empty or contain invalid characters", "USEREXCEP-400", 400),
     INVALID_CPF("Invalid CPF format", "USEREXCEP-400", 400),
     INVALID_ROLE("Invalid role or does not exists", "USEREXCEP-400", 400),
