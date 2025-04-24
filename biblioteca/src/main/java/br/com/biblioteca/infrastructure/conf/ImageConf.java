@@ -14,8 +14,7 @@ import java.util.UUID;
 public class ImageConf {
 
     private static final String UPLOAD_DIR = "uploads/";
-    private static final String PROD_BASE_URL = "https://missaonrf25.pe.senac.br/appevento/uploads/";
-
+    private static final String PROD_BASE_URL = "https://porto-library.com.br/appevento/uploads/";
     private static final Logger logger = LoggerFactory.getLogger(ImageConf.class);
 
     public String saveImage(MultipartFile file, HttpServletRequest request) throws IOException {
@@ -59,7 +58,7 @@ public class ImageConf {
         String baseUrl = request.getScheme() + "://" + request.getServerName() +
                 (request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "");
 
-        if (baseUrl.contains("missaonrf25.pe.senac.br")) {
+        if (baseUrl.contains("porto-library.com.br")) {
             logger.info("Ambiente de produção detectado. URL de produção: {}", PROD_BASE_URL + fileName);
             return PROD_BASE_URL + fileName;
         }
