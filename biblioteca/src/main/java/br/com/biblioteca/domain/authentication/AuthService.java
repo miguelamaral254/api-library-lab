@@ -17,8 +17,13 @@ public class AuthService {
 
     @Transactional
     public User authenticateUser(String email, String password) {
+        if (email == null || password == null) {
+            throw new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH);
+        }
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH));
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BusinessException(UserExceptionCodeEnum.INVALID_PASSWORD);
         }
