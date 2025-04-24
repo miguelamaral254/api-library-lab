@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -47,6 +46,7 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
     }
+
     @Transactional
     public User updateUser(Long id, Consumer<User> mergeNonNull) {
         User user = findById(id);
@@ -57,31 +57,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    private void validateUpdate(User user, String oldEmail, String oldCpf) {
-        if (!oldEmail.equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
-        }
-
-        if (!oldCpf.equals(user.getCpf()) && userRepository.existsByCpfAndIdNot(user.getCpf(), user.getId())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_USER);
-        }
-    }
-
     @Transactional
     public User disableUser(Long id, Boolean disable) {
         User user = findById(id);
         user.setEnabled(disable);
         return userRepository.save(user);
-    }
-
-    @Transactional
-    public User authenticateUser(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.EMAIL_DOES_NOT_MATCH));
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_PASSWORD);
-        }
-        return user;
     }
 
     private void validateBusinessRules(User user) {
@@ -139,4 +119,13 @@ public class UserService {
         }
     }
 
+    private void validateUpdate(User user, String oldEmail, String oldCpf) {
+        if (!oldEmail.equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
+        }
+
+        if (!oldCpf.equals(user.getCpf()) && userRepository.existsByCpfAndIdNot(user.getCpf(), user.getId())) {
+            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_USER);
+        }
+    }
 }

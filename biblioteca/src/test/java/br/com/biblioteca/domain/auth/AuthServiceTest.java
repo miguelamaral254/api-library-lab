@@ -1,0 +1,121 @@
+package br.com.biblioteca.domain.auth;
+
+import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.authentication.AuthService;
+import br.com.biblioteca.domain.user.User;
+import br.com.biblioteca.domain.user.UserRepository;
+import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
+import br.com.biblioteca.domain.user.factories.UserFactory;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class AuthServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private AuthService authService;
+
+    @Test
+    @DisplayName("Should authenticate user successfully with valid credentials")
+    void authenticateUser_whenValidCredentials_thenReturnUser() {
+        String email = "test@example.com";
+        String password = "validPassword";
+        String encodedPassword = "encodedPassword123";
+
+        User user = UserFactory.savedUser(1L);
+        user.setPassword(encodedPassword);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
+
+        User authenticatedUser = authService.authenticateUser(email, password);
+
+        assertNotNull(authenticatedUser);
+        assertEquals(user, authenticatedUser);
+
+        verify(userRepository, times(1)).findByEmail(email);
+        verify(passwordEncoder, times(1)).matches(password, encodedPassword);
+    }
+
+    @Test
+    @DisplayName("Should throw EMAIL_AND_PASSWORD_DOES_NOT_MATCH when email is invalid")
+    void authenticateUser_whenInvalidEmail_thenThrowException() {
+        String email = "invalid@example.com";
+        String password = "anyPassword";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> authService.authenticateUser(email, password));
+
+        assertEquals(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH, exception.getExceptionCode());
+
+        verify(userRepository, times(1)).findByEmail(email);
+        verify(passwordEncoder, never()).matches(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should throw INVALID_PASSWORD when password is incorrect")
+    void authenticateUser_whenInvalidPassword_thenThrowException() {
+        String email = "test@example.com";
+        String password = "invalidPassword";
+        String encodedPassword = "encodedPassword123";
+
+        User user = UserFactory.savedUser(1L);
+        user.setPassword(encodedPassword);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(password, encodedPassword)).thenReturn(false);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> authService.authenticateUser(email, password));
+
+        assertEquals(UserExceptionCodeEnum.INVALID_PASSWORD, exception.getExceptionCode());
+
+        verify(userRepository, times(1)).findByEmail(email);
+        verify(passwordEncoder, times(1)).matches(password, encodedPassword);
+    }
+
+    @Test
+    @DisplayName("Should throw EMAIL_AND_PASSWORD_DOES_NOT_MATCH when email is null")
+    void authenticateUser_whenEmailIsNull_thenThrowException() {
+        String password = "anyPassword";
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> authService.authenticateUser(null, password));
+
+        assertEquals(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH, exception.getExceptionCode());
+
+        verify(userRepository, never()).findByEmail(any());
+        verify(passwordEncoder, never()).matches(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should throw EMAIL_AND_PASSWORD_DOES_NOT_MATCH when password is null")
+    void authenticateUser_whenPasswordIsNull_thenThrowException() {
+        String email = "test@example.com";
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> authService.authenticateUser(email, null));
+        assertEquals(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH, exception.getExceptionCode());
+
+        verify(userRepository, never()).findByEmail(any());
+        verify(passwordEncoder, never()).matches(any(), any());
+    }
+}

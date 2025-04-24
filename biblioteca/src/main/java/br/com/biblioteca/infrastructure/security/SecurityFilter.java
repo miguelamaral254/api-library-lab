@@ -1,8 +1,9 @@
 package br.com.biblioteca.infrastructure.security;
 
-import br.com.biblioteca.domain.authentication.AuthService;
+import br.com.biblioteca.core.BusinessException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
+import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import java.util.Collections;
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
-    private AuthService authService;
+    private JwtConfig jwtConfig;
 
     @Autowired
     private UserRepository userRepository;
@@ -31,11 +32,11 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = extractToken(request);
 
-        if (token != null && authService.validateToken(token)) {
-            String email = authService.extractEmail(token);
+        if (token != null && jwtConfig.validateToken(token)) {
+            String email = jwtConfig.extractEmail(token);
 
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
 
             var authorities = Collections.singletonList(
                     new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));

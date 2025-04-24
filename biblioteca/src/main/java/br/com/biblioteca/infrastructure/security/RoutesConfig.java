@@ -7,8 +7,6 @@ public class RoutesConfig {
     public static final String[] PUBLIC_ROUTES = {
             "swagger-ui/index.html",
             "/auth/**",
-            "/projects/**",
-            "/editals/**",
             "/users/**",
             "/books/**",
             "/book-artifacts/**"

@@ -1,65 +1,32 @@
 package br.com.biblioteca.domain.authentication;
 
 import br.com.biblioteca.core.BusinessException;
-import br.com.biblioteca.core.GeneralExceptionCodeEnum;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import br.com.biblioteca.domain.user.User;
+import br.com.biblioteca.domain.user.UserRepository;
+import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-
+@AllArgsConstructor
 @Service
 public class AuthService {
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    @Value("${api.security.token.secret}")
-    private String secretKey;
-
-    private static final long EXPIRATION_TIME = 86400000;
-
-    public String generateToken(String email, String role) {
-        try {
-            return Jwts.builder()
-                    .setSubject(email)
-                    .claim("role", "ROLE_" + role)
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                    .signWith(SignatureAlgorithm.HS512, secretKey)
-                    .compact();
-        } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.SERVER_ERROR );
+    @Transactional
+    public User authenticateUser(String email, String password) {
+        if (email == null || password == null) {
+            throw new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH);
         }
-    }
 
-    public boolean validateToken(String token) {
-        try {
-            var claims = Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH));
 
-            String role = claims.get("role", String.class);
-            return role != null && (
-                    role.equals("ROLE_ADMIN") ||
-                            role.equals("ROLE_PROFESSOR") ||
-                            role.equals("ROLE_STUDENT") ||
-                            role.equals("ROLE_MANAGER") ||
-                            role.equals("ROLE_PARTNER_COMPANY")
-            );
-        } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.INVALID_TOKEN);
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BusinessException(UserExceptionCodeEnum.INVALID_PASSWORD);
         }
-    }
-
-    public String extractEmail(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.INVALID_TOKEN);
-        }
+        return user;
     }
 }
