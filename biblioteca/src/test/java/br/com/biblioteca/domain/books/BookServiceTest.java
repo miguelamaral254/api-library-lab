@@ -5,7 +5,7 @@ import br.com.biblioteca.domain.book.*;
 import br.com.biblioteca.domain.books.factories.BookFactory;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.factories.UserFactory;
+import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.infrastructure.conf.ImageConf;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -15,10 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Optional;
-
+import static br.com.biblioteca.domain.user.factories.UserFactory.savedUser;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -50,7 +49,7 @@ class BookServiceTest {
         Book savedBook = BookFactory.savedBook(1L);
 
         Long userId = 42L;
-        var user = UserFactory.savedUser(userId);
+        var user = savedUser(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(bookRepository.save(book)).thenReturn(savedBook);
@@ -97,7 +96,7 @@ class BookServiceTest {
         Long bookId = 1L;
         Long userId = 42L;
         Book existingBook = BookFactory.savedBook(bookId);
-        User existingUser = UserFactory.savedUser(userId);
+        User existingUser = savedUser(userId);
 
         existingBook.setUserId(existingUser);
 
@@ -114,8 +113,55 @@ class BookServiceTest {
         assertEquals("Novo Título", result.getTitle());
     }
 
+    @Test
+    @DisplayName("Should throw exception when book is not found")
+    void updateBook_whenBookNotFound_thenThrowException() {
+        Long bookId = 1L;
 
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+        BusinessException exception = assertThrows(BusinessException.class, () -> bookService.updateBook(bookId, book -> book.setTitle("Novo Título")));
 
+        assertEquals(BookExceptionCodeEnum.BOOK_NOT_FOUND, exception.getExceptionCode());
+
+        verify(bookRepository, times(1)).findById(bookId);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when user is not found")
+    void updateBook_whenUserNotFound_thenThrowException() {
+        Long bookId = 1L;
+        User existingUser = savedUser(bookId);
+
+        Book existingBook = BookFactory.savedBook(bookId);
+        existingBook.setUserId(existingUser);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
+        when(userRepository.findById(existingUser.getId())).thenReturn(Optional.empty());
+        BusinessException exception = assertThrows(BusinessException.class, () -> bookService.updateBook(bookId, book -> book.setTitle("Novo Título")));
+
+        assertEquals(UserExceptionCodeEnum.USER_NOT_FOUND, exception.getExceptionCode());
+
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(userRepository, times(1)).findById(existingUser.getId());
+    }
+
+    @Test
+    @DisplayName("Should update book available")
+    void updateBook_whenBookAvailable_thenUpdateSuccessfully() {
+        Long bookId = 1L;
+        Book existingBook = BookFactory.savedBook(bookId);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
+        when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Book updatedBook = bookService.updateAvailability(bookId, false);
+
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(bookRepository, times(1)).save(any(Book.class));
+
+        assertNotNull(updatedBook);
+        assertFalse(updatedBook.getAvailable());
+    }
 
 
 }
