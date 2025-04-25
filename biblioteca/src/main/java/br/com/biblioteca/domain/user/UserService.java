@@ -54,6 +54,7 @@ public class UserService {
         final String oldCpf = user.getCpf();
         mergeNonNull.accept(user);
         validateUpdate(user, oldEmail, oldCpf);
+
         return userRepository.save(user);
     }
 

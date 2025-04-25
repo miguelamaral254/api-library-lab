@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -73,11 +74,11 @@ public class BookService {
 
 
     @Transactional
-    public Book updateBook(Long id, BookDTO bookDtoUpdates) {
+    public Book updateBook(Long id, Consumer<Book> mergeNonNull) {
         Book existingBook = findById(id);
-        bookMapper.mergeNonNull(bookDtoUpdates, existingBook);
+        mergeNonNull.accept(existingBook);
+        validateBusinessRules(existingBook);
 
-        validateUpdateBusiness(existingBook);
         return bookRepository.save(existingBook);
     }
 

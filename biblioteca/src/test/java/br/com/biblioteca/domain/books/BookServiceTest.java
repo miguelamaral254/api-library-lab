@@ -1,9 +1,9 @@
 package br.com.biblioteca.domain.books;
 
-import br.com.biblioteca.domain.book.Book;
-import br.com.biblioteca.domain.book.BookRepository;
-import br.com.biblioteca.domain.book.BookService;
+import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.book.*;
 import br.com.biblioteca.domain.books.factories.BookFactory;
+import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
 import br.com.biblioteca.domain.user.factories.UserFactory;
 import br.com.biblioteca.infrastructure.conf.ImageConf;
@@ -19,10 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -67,5 +66,56 @@ class BookServiceTest {
         assertNotNull(result.getId());
         assertEquals("https://localhost:8080/uploads/image_url", result.getUrlImage());
     }
+    @Test
+    @DisplayName("Should throw exception when book is not found")
+    void findById_whenBookNotFound_thenThrowException() {
+        Long bookId = 1L;
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> bookService.findById(bookId));
+        assertEquals(BookExceptionCodeEnum.BOOK_NOT_FOUND, exception.getExceptionCode());
+    }
+
+    @Test
+    @DisplayName("Should return book when book exists")
+    void findById_whenBookExists_thenReturnBook() {
+        Long bookId = 1L;
+        Book book = BookFactory.savedBook(bookId);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        Book result = bookService.findById(bookId);
+
+        assertNotNull(result);
+        assertEquals(bookId, result.getId());
+    }
+
+    @Test
+    @DisplayName("Should update Book successfully with Consumer")
+    void updateBook_whenDataIsValid_thenUpdateSuccessfully() {
+        Long bookId = 1L;
+        Long userId = 42L;
+        Book existingBook = BookFactory.savedBook(bookId);
+        User existingUser = UserFactory.savedUser(userId);
+
+        existingBook.setUserId(existingUser);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Book result = bookService.updateBook(bookId, book -> book.setTitle("Novo Título"));
+
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(userRepository, times(1)).findById(userId);
+        verify(bookRepository, times(1)).save(any(Book.class));
+
+        assertEquals("Novo Título", result.getTitle());
+    }
+
+
+
+
 
 }
