@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -112,8 +111,6 @@ public class BookService {
         if (book.getUserId() == null) {
             throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
         }
-
-
 
         if (book.getGender() == null || !Enum.valueOf(Gender.class, book.getGender().name()).equals(book.getGender())) {
             throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);

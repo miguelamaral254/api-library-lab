@@ -1,6 +1,7 @@
 package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.BaseDTO;
+import br.com.biblioteca.validations.groups.CreateValidation;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -14,19 +15,19 @@ public record BookDTO(
         @Null
         Long id,
 
-        @NotBlank
+        @NotBlank(groups = {CreateValidation.class})
         String urlImage,
 
-        @NotBlank
+        @NotBlank(groups = {CreateValidation.class})
         String title,
 
-        @NotNull
+        @NotBlank(groups = {CreateValidation.class})
         Long userId,
 
-        @NotBlank
+        @NotBlank(groups = {CreateValidation.class})
         String description,
 
-        @NotNull
+        @NotBlank(groups = {CreateValidation.class})
         @Enumerated(EnumType.STRING)
         Gender gender,
 
