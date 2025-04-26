@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,12 @@ public class BookService {
         if (book.getUserId() == null || book.getUserId().getId() == null) {
             throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
         }
+
+        if (book.getGender() == null || !Stream.of(Gender.values()).anyMatch(g -> g == book.getGender())) {
+            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+        }
+
+
 
         User user = userRepository.findById(book.getUserId().getId())
                 .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
