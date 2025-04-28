@@ -168,6 +168,18 @@ class BookServiceTest {
         assertNotNull(updatedBook);
         assertFalse(updatedBook.getAvailable());
     }
+    @Test
+    @DisplayName("Should delete book")
+    void deleteBook_whenBookExists_thenDeleteSuccessfully() {
+        Long bookId = 1L;
+        Book existingBook = BookFactory.savedBook(bookId);
 
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
+        bookService.deleteBook(bookId);
+
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(bookRepository, times(1)).delete(existingBook);
+
+    }
 
 }

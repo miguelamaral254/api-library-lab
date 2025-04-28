@@ -1,6 +1,7 @@
 package br.com.biblioteca.domain.bookartefact;
 
 import br.com.biblioteca.core.BaseDTO;
+import br.com.biblioteca.validations.groups.CreateValidation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -14,7 +15,7 @@ public record BookArtifactDTO(
         @NotNull
         Long bookId,
 
-        @NotBlank
+        @NotBlank(groups = {CreateValidation.class})
         String description,
 
         @Null
