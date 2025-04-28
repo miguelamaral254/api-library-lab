@@ -1,6 +1,8 @@
 package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.ApplicationResponse;
+import br.com.biblioteca.domain.user.User;
+import br.com.biblioteca.domain.user.UserDTO;
 import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -103,11 +105,10 @@ public class BookController {
     @Operation(summary = "Update an existing book")
     public ResponseEntity<ApplicationResponse<BookDTO>> updateBook(
             @PathVariable Long id,
-            @Validated(UpdateValidation.class) @RequestBody BookDTO bookDtoUpdates) {
-
-        Book updatedBook = bookService.updateBook(id, bookDtoUpdates);
-        BookDTO updatedBookDto = bookMapper.toDto(updatedBook);
-
+            @Validated(UpdateValidation.class)
+            @RequestBody BookDTO bookDtoUpdates) {
+        Book bookUpdated = bookService.updateBook(id, book -> bookMapper.mergeNonNull(bookDtoUpdates, book));
+        BookDTO updatedBookDto = bookMapper.toDto(bookUpdated);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApplicationResponse.ofSuccess(updatedBookDto));

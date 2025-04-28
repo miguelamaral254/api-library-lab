@@ -2,6 +2,7 @@ package br.com.biblioteca.core;
 
 import lombok.Getter;
 
+
 @Getter
 public enum GeneralExceptionCodeEnum implements ExceptionCode {
 

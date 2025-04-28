@@ -24,15 +24,19 @@ public class Book extends BaseEntity {
     private User userId;
 
     @NotBlank
+    @Column(nullable = false)
     private String urlImage;
 
     @NotBlank
+    @Column(nullable = false)
     private String title;
 
     @NotBlank
+    @Column(nullable = false)
     private String description;
 
     @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

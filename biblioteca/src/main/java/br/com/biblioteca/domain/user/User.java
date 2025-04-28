@@ -26,6 +26,7 @@ public class User extends BaseEntity {
     private String name;
 
     @NotBlank
+    @Column(nullable = false)
     private String imageUrl;
 
     @Column(unique = true)
@@ -33,28 +34,33 @@ public class User extends BaseEntity {
 
     @NotBlank
     @Email
+    @Column(nullable = false)
     private String email;
 
     @NotBlank
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @NotBlank
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Course course;
 
     @NotBlank
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Institution institution;
 
     @NotNull
+    @Column(nullable = false)
     private String password;
 
     @NotBlank
+    @Column(nullable = false)
     private String number;
 
     @NotBlank
+    @Column(nullable = false)
     private String countryCode;
-
-
 }

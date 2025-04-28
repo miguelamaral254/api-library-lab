@@ -8,7 +8,7 @@ import br.com.biblioteca.core.BaseMapper;
 public interface BookMapper extends BaseMapper<Book, BookDTO> {
 
     @Mapping(source = "userId", target = "userId")
-    BookDTO toDTO(Book book);
+    BookDTO toDto(Book book);
 
     @Override
     @Mapping(source = "userId", target = "userId")
