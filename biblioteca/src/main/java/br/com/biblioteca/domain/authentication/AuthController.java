@@ -12,17 +12,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtConfig jwtConfig;
     private final AuthMapper authMapper;
 
     @PostMapping()
-    public ResponseEntity<AuthDTO> login(@RequestBody AuthRequest authRequest) {
-        User user = authService.authenticateUser(authRequest.getEmail(), authRequest.getPassword());
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO authRequestDTO) {
 
-        String token = jwtConfig.generateToken(user.getEmail(), user.getRole().name());
-
-        AuthDTO response = authMapper.toAuthDTO(user);
-        response = new AuthDTO(response.idUser(), token, response.email(), response.role(), "Login successful");
+        AuthRequest request = authMapper.toAuthRequest(authRequestDTO);
+        User authenticatedUser = authService.authenticateUser(request.getEmail(), request.getPassword());
+        String token = authService.generateToken(authenticatedUser);
+        AuthDTO authDTO = new AuthDTO(token, "Login successful");
+        AuthResponseDTO response = authMapper.toAuthResponseDTO(authDTO);
 
         return ResponseEntity.ok(response);
     }

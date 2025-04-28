@@ -1,11 +1,13 @@
 package br.com.biblioteca.domain.auth;
 
 import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.authentication.AuthDTO;
 import br.com.biblioteca.domain.authentication.AuthService;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.domain.user.factories.UserFactory;
+import br.com.biblioteca.infrastructure.security.JwtConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -28,12 +31,15 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtConfig jwtConfig;
+
     @InjectMocks
     private AuthService authService;
 
     @Test
     @DisplayName("Should authenticate user successfully with valid credentials")
-    void authenticateUser_whenValidCredentials_thenReturnUser() {
+    void authenticateUser_whenValidCredentials_thenReturnAuthDTO() {
         String email = "test@example.com";
         String password = "validPassword";
         String encodedPassword = "encodedPassword123";
@@ -44,10 +50,17 @@ class AuthServiceTest {
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
 
-        User authenticatedUser = authService.authenticateUser(email, password);
+        String generatedToken = "generatedToken123";
+        when(jwtConfig.generateToken(user.getEmail(), user.getRole().name())).thenReturn(generatedToken);
 
-        assertNotNull(authenticatedUser);
-        assertEquals(user, authenticatedUser);
+        User authenticatedUser = authService.authenticateUser(email, password);
+        String token = authService.generateToken(authenticatedUser);
+
+        AuthDTO authDTO = new AuthDTO(token, "Login successful");
+
+        assertNotNull(authDTO);
+        assertEquals(generatedToken, authDTO.token());
+        assertEquals("Login successful", authDTO.message());
 
         verify(userRepository, times(1)).findByEmail(email);
         verify(passwordEncoder, times(1)).matches(password, encodedPassword);
@@ -113,9 +126,11 @@ class AuthServiceTest {
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> authService.authenticateUser(email, null));
+
         assertEquals(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH, exception.getExceptionCode());
 
         verify(userRepository, never()).findByEmail(any());
         verify(passwordEncoder, never()).matches(any(), any());
     }
+
 }
