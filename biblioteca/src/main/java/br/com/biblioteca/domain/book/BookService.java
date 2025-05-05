@@ -4,7 +4,7 @@ import br.com.biblioteca.core.BusinessException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.infrastructure.conf.ImageConf;
+import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -26,7 +25,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
-    private final ImageConf imageConf;
+    private final ImageConfig imageConfig;
 
     @Transactional
     public Book createBook(Book book, MultipartFile file, HttpServletRequest request) {
@@ -60,7 +59,7 @@ public class BookService {
             validateBusinessRules(book);
 
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConf.saveImage(file, request);
+                String urlImage = imageConfig.saveImage(file, request);
                 book.setUrlImage(urlImage);
             }
 

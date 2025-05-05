@@ -2,6 +2,8 @@ package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.BaseDTO;
 import br.com.biblioteca.validations.groups.CreateValidation;
+import br.com.biblioteca.validations.groups.UpdateValidation;
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;

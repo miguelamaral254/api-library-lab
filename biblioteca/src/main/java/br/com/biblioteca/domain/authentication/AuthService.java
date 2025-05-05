@@ -28,7 +28,7 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_PASSWORD);
+            throw new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH);
         }
 
         return user;

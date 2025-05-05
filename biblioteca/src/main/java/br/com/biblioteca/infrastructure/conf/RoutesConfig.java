@@ -1,7 +1,9 @@
-package br.com.biblioteca.infrastructure.security;
+package br.com.biblioteca.infrastructure.conf;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 
+@Configuration
 public class RoutesConfig {
     // TODO: AJUSTAR ROTAS A DEPENDER DAS ROLES!
     public static final String[] PUBLIC_ROUTES = {
@@ -10,8 +12,6 @@ public class RoutesConfig {
             "/users/**",
             "/books/**",
             "/book-artifacts/**"
-
-
     };
     public static final String[] USER_ROUTES = {
 

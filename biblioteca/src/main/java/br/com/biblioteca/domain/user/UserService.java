@@ -6,7 +6,7 @@ import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
 import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.infrastructure.conf.ImageConf;
+import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ImageConf imageConf;
+    private final ImageConfig imageConfig;
 
     @Transactional
     public User createUser(User user, MultipartFile file, HttpServletRequest request) {
@@ -111,7 +111,7 @@ public class UserService {
 
 
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConf.saveImage(file, request);
+                String urlImage = imageConfig.saveImage(file, request);
                 user.setImageUrl(urlImage);
             }
 
