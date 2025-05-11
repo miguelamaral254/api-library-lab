@@ -9,6 +9,7 @@ import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,6 +42,7 @@ public class UserService {
         return userRepository.findAll(specification, pageable);
     }
 
+    @Cacheable(value = "users", key = "#id")
     @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id)
@@ -108,8 +110,6 @@ public class UserService {
 
     private void validateImageCreateRules(User user, MultipartFile file, HttpServletRequest request) {
         try {
-
-
             if (file != null && !file.isEmpty()) {
                 String urlImage = imageConfig.saveImage(file, request);
                 user.setImageUrl(urlImage);

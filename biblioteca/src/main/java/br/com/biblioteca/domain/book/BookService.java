@@ -7,6 +7,7 @@ import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -68,10 +69,12 @@ public class BookService {
         }
     }
 
+    @Cacheable(value = "books", key = "#id")
     @Transactional(readOnly = true)
     public Book findById(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
+
     }
 
     @Transactional(readOnly = true)
