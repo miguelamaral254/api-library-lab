@@ -1,6 +1,6 @@
 package br.com.biblioteca.domain.authentication;
 
-public record AuthDTO(
+public record AuthResponseDTO(
         String token,
         String message
 ) {

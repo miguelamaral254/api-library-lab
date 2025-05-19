@@ -1,12 +1,11 @@
 package br.com.biblioteca.domain.books;
 
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.core.BaseException;
 import br.com.biblioteca.domain.book.*;
 import br.com.biblioteca.domain.books.factories.BookFactory;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.infrastructure.conf.ImageConf;
+import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ class BookServiceTest {
     private BookRepository bookRepository;
 
     @Mock
-    private ImageConf imageConf;
+    private ImageConfig imageConfig;
 
     @Mock
     private MultipartFile file;
@@ -53,14 +52,14 @@ class BookServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(bookRepository.save(book)).thenReturn(savedBook);
-        when(imageConf.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
+        when(imageConfig.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
 
         book.setUserId(user);
 
         Book result = bookService.createBook(book, file, request);
 
         verify(bookRepository).save(book);
-        verify(imageConf).saveImage(file, request);
+        verify(imageConfig).saveImage(file, request);
         verify(userRepository).findById(userId);
 
         assertNotNull(result.getId());
@@ -72,11 +71,11 @@ class BookServiceTest {
         Long bookId = 1L;
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        BusinessException exception = assertThrows(BusinessException.class, () -> bookService.findById(bookId));
+        BaseException exception = assertThrows(BaseException.class, () -> bookService.findById(bookId));
 
         verify(bookRepository, times(1)).findById(bookId);
 
-        assertEquals(BookExceptionCodeEnum.BOOK_NOT_FOUND, exception.getExceptionCode());
+        assertEquals("Book not found", exception.getMessage());
     }
 
     @Test
@@ -122,11 +121,11 @@ class BookServiceTest {
         Long bookId = 1L;
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
-        BusinessException exception = assertThrows(BusinessException.class, () -> bookService.updateBook(bookId, book -> book.setTitle("Novo Título")));
+        BaseException exception = assertThrows(BaseException.class, () -> bookService.updateBook(bookId, book -> book.setTitle("Novo Título")));
 
         verify(bookRepository, times(1)).findById(bookId);
 
-        assertEquals(BookExceptionCodeEnum.BOOK_NOT_FOUND, exception.getExceptionCode());
+        assertEquals("Book not found", exception.getMessage());
     }
 
     @Test
@@ -140,13 +139,12 @@ class BookServiceTest {
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
         when(userRepository.findById(existingUser.getId())).thenReturn(Optional.empty());
-        BusinessException exception = assertThrows(
-                BusinessException.class,
+        BaseException exception = assertThrows(
+                BaseException.class,
                 () -> bookService.updateBook(bookId, book -> book.setTitle("Novo Título"))
         );
 
-        assertEquals(UserExceptionCodeEnum.USER_NOT_FOUND, exception.getExceptionCode());
-
+        assertEquals("User not found", exception.getMessage());
         verify(bookRepository, times(1)).findById(bookId);
         verify(userRepository, times(1)).findById(existingUser.getId());
     }

@@ -2,8 +2,10 @@ package br.com.biblioteca.infrastructure.conf;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+@Configuration
 @Component
 public class DotenvConfig {
 

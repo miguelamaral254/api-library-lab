@@ -1,8 +1,6 @@
 package br.com.biblioteca.domain.book;
 
 import br.com.biblioteca.core.ApplicationResponse;
-import br.com.biblioteca.domain.user.User;
-import br.com.biblioteca.domain.user.UserDTO;
 import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

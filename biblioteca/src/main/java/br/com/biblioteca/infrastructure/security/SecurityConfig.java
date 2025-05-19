@@ -1,5 +1,6 @@
 package br.com.biblioteca.infrastructure.security;
 
+import br.com.biblioteca.infrastructure.conf.RoutesConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

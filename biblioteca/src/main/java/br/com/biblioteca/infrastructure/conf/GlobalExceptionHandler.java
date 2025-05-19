@@ -1,7 +1,6 @@
 package br.com.biblioteca.infrastructure.conf;
 
-
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.core.BaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,20 +9,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Object> handleBusinessException(BusinessException ex) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        if (ex.getExceptionCode() != null) {
-            status = HttpStatus.valueOf(ex.getExceptionCode().getHttpStatus());
-        }
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
+        HttpStatus status = ex.getHttpStatus();
+
         return ResponseEntity.status(status)
-                .body(new ErrorResponse(ex.getExceptionCode().getCode(), ex.getMessage()));
+                .body(new ErrorResponse(
+                        String.valueOf(status.value()),
+                        ex.getMessage()
+                ));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGenericException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("GENERAL_ERROR", "An unexpected error occurred."));
+                .body(new ErrorResponse("500", "An unexpected error occurred."));
     }
 
     static class ErrorResponse {

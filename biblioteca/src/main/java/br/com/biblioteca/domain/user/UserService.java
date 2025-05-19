@@ -1,14 +1,16 @@
 package br.com.biblioteca.domain.user;
 
-import br.com.biblioteca.core.BusinessException;
-import br.com.biblioteca.domain.book.BookExceptionCodeEnum;
+import br.com.biblioteca.domain.exceptions.ConflictException;
+import br.com.biblioteca.domain.exceptions.InvalidException;
+import br.com.biblioteca.domain.exceptions.NotFoundException;
+import br.com.biblioteca.domain.exceptions.ServerException;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.infrastructure.conf.ImageConf;
+import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,7 +27,7 @@ import java.util.function.Consumer;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ImageConf imageConf;
+    private final ImageConfig imageConfig;
 
     @Transactional
     public User createUser(User user, MultipartFile file, HttpServletRequest request) {
@@ -41,10 +43,11 @@ public class UserService {
         return userRepository.findAll(specification, pageable);
     }
 
+    @Cacheable(value = "users", key = "#id")
     @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Transactional
@@ -68,65 +71,63 @@ public class UserService {
     private void validateBusinessRules(User user) {
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
+            throw new ConflictException("Email already exists");
         }
 
         if (user.getCpf() != null && userRepository.existsByCpf(user.getCpf())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_CPF);
+            throw new ConflictException("Cpf already exists");
         }
 
         if (user.getEmail() == null || !user.getEmail().matches("[a-zA-Z0-9._%+-]+@[a-zAZ0-9.-]+\\.[a-zA-Z]{2,6}")) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_EMAIL);
+            throw new InvalidException("Email are with Invalid format");
         }
 
         if (user.getCpf() != null && !user.getCpf().matches("\\d{11}")) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_CPF);
+            throw new InvalidException("Cpf are with Invalid format");
         }
 
         if (user.getPassword() == null || user.getPassword().length() < 6) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_PASSWORD);
+            throw new InvalidException("Password are with Invalid format");
         }
 
         if (user.getName() == null || user.getName().trim().isEmpty() ||
                 !user.getName().matches("[A-Za-zÀ-ÿ\\s'-]+")) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_NAME);
+            throw new InvalidException("Name are with Invalid format");
         }
 
         if (user.getInstitution() == null || !Arrays.asList(Institution.values()).contains(user.getInstitution())) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_INSTITUTION);
+            throw new NotFoundException("Institution does not exist");
         }
 
         if (user.getCourse() == null || !Arrays.asList(Course.values()).contains(user.getCourse())) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_COURSE);
+            throw new NotFoundException("Course does not exist");
         }
 
         if (user.getRole() == null || !Arrays.asList(Role.values()).contains(user.getRole())) {
-            throw new BusinessException(UserExceptionCodeEnum.INVALID_ROLE);
+            throw new NotFoundException("Role does not exist");
         }
 
     }
 
     private void validateImageCreateRules(User user, MultipartFile file, HttpServletRequest request) {
         try {
-
-
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConf.saveImage(file, request);
+                String urlImage = imageConfig.saveImage(file, request);
                 user.setImageUrl(urlImage);
             }
 
         } catch (IOException e) {
-            throw new BusinessException(BookExceptionCodeEnum.IMAGE_CREATION_FAILED);
+            throw new ServerException("Server error");
         }
     }
 
     private void validateUpdate(User user, String oldEmail, String oldCpf) {
         if (!oldEmail.equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_EMAIL);
+            throw new ConflictException("Email already exists");
         }
 
         if (!oldCpf.equals(user.getCpf()) && userRepository.existsByCpfAndIdNot(user.getCpf(), user.getId())) {
-            throw new BusinessException(UserExceptionCodeEnum.DUPLICATE_USER);
+            throw new ConflictException("CPF already exists");
         }
     }
 }

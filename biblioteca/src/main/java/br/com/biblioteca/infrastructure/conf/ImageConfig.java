@@ -2,7 +2,7 @@ package br.com.biblioteca.infrastructure.conf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -10,12 +10,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-@Service
-public class ImageConf {
+@Configuration
+public class ImageConfig {
 
     private static final String UPLOAD_DIR = "uploads/";
     private static final String PROD_BASE_URL = "https://porto-library.com.br/appevento/uploads/";
-    private static final Logger logger = LoggerFactory.getLogger(ImageConf.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImageConfig.class);
 
     public String saveImage(MultipartFile file, HttpServletRequest request) throws IOException {
         logger.info("Iniciando o processo de salvamento da imagem...");

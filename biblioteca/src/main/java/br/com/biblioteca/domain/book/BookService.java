@@ -1,10 +1,11 @@
 package br.com.biblioteca.domain.book;
 
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.exceptions.InvalidException;
+import br.com.biblioteca.domain.exceptions.NotFoundException;
+import br.com.biblioteca.domain.exceptions.ServerException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
-import br.com.biblioteca.infrastructure.conf.ImageConf;
+import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -26,7 +26,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
-    private final ImageConf imageConf;
+    private final ImageConfig imageConfig;
 
     @Transactional
     public Book createBook(Book book, MultipartFile file, HttpServletRequest request) {
@@ -37,21 +37,21 @@ public class BookService {
 
     private void validateBusinessRules(Book book) {
         if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_TITLE);
+            throw new InvalidException("Book title is required");
         }
 
         if (book.getUserId() == null || book.getUserId().getId() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
+            throw new InvalidException("User id is required");
         }
 
         if (book.getGender() == null || !Stream.of(Gender.values()).anyMatch(g -> g == book.getGender())) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+            throw new InvalidException("Gender is required");
         }
 
 
 
         User user = userRepository.findById(book.getUserId().getId())
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         book.setUserId(user);
     }
@@ -60,21 +60,21 @@ public class BookService {
             validateBusinessRules(book);
 
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConf.saveImage(file, request);
+                String urlImage = imageConfig.saveImage(file, request);
                 book.setUrlImage(urlImage);
             }
 
         } catch (IOException e) {
-            throw new BusinessException(BookExceptionCodeEnum.IMAGE_CREATION_FAILED);
+            throw new ServerException("Problem with image creation");
         }
     }
 
     @Transactional(readOnly = true)
     public Book findById(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
-    }
+                .orElseThrow(() -> new NotFoundException("Book not found"));
 
+    }
     @Transactional(readOnly = true)
     public Page<Book> searchBooks(Specification<Book> specification, Pageable pageable) {
         return bookRepository.findAll(specification, pageable);
@@ -102,27 +102,27 @@ public class BookService {
 
     private void validateUpdateBusiness(Book book) {
         if (book == null) {
-            throw new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND);
+            throw new NotFoundException("Book not found");
         }
 
         if (book.getAvailable() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+            throw new InvalidException("Book available required");
         }
 
         if (!book.getAvailable().equals(Boolean.TRUE) && !book.getAvailable().equals(Boolean.FALSE)) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+            throw new InvalidException("Book available required");
         }
 
         if (book.getTitle() == null || book.getTitle().isEmpty()) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_TITLE);
+            throw new InvalidException("Book title required");
         }
 
         if (book.getUserId() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
+            throw new InvalidException("Book user id required");
         }
 
         if (book.getGender() == null || !Enum.valueOf(Gender.class, book.getGender().name()).equals(book.getGender())) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+            throw new InvalidException("Book gender required");
         }
     }
 

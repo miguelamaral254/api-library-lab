@@ -1,13 +1,13 @@
 package br.com.biblioteca.domain.authentication;
 
-import br.com.biblioteca.core.BaseMapper;
-import br.com.biblioteca.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface AuthMapper extends BaseMapper {
+public interface AuthMapper {
+    AuthRequest toAuthRequest(AuthRequestDTO authRequestDTO);
 
-    @Mapping(source = "id", target = "idUser")
-    AuthDTO toAuthDTO(User user);
+    @Mapping(source = "token", target = "token")
+    @Mapping(source = "message", target = "message")
+    AuthResponseDTO toAuthResponseDTO(AuthDTO authDTO);
 }
