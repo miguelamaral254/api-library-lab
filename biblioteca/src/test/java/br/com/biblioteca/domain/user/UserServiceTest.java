@@ -1,7 +1,6 @@
 package br.com.biblioteca.domain.user;
 
-import br.com.biblioteca.core.BusinessException;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
+import br.com.biblioteca.core.BaseException;
 import br.com.biblioteca.domain.user.factories.UserFactory;
 import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,10 +78,10 @@ class UserServiceTest {
 
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        BaseException exception = assertThrows(BaseException.class,
                 () -> userService.createUser(user, file, request));
 
-        assertEquals(UserExceptionCodeEnum.DUPLICATE_EMAIL, exception.getExceptionCode());
+        assertEquals("Email already exists", exception.getMessage());
         verify(userRepository, never()).save(any());
     }
     @Test
@@ -106,10 +105,10 @@ class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        BaseException exception = assertThrows(BaseException.class,
                 () -> userService.findById(userId));
 
-        assertEquals(UserExceptionCodeEnum.USER_NOT_FOUND, exception.getExceptionCode());
+        assertEquals("User not found", exception.getMessage());
     }
 
     @Test
@@ -155,10 +154,10 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByEmailAndIdNot(newEmail, userId)).thenReturn(true);
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        BaseException exception = assertThrows(BaseException.class,
                 () -> userService.updateUser(userId, user -> user.setEmail(newEmail)));
 
-        assertEquals(UserExceptionCodeEnum.DUPLICATE_EMAIL, exception.getExceptionCode());
+        assertEquals("Email already exists", exception.getMessage());
         verify(userRepository, never()).save(any());
     }
     @Test
@@ -171,10 +170,10 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByCpfAndIdNot(newCpf, userId)).thenReturn(true);
 
-        BusinessException exception = assertThrows(BusinessException.class,
+        BaseException exception = assertThrows(BaseException.class,
                 () -> userService.updateUser(userId, user -> user.setCpf(newCpf)));
 
-        assertEquals(UserExceptionCodeEnum.DUPLICATE_USER, exception.getExceptionCode());
+        assertEquals("CPF already exists", exception.getMessage());
         verify(userRepository, never()).save(any());
     }
 

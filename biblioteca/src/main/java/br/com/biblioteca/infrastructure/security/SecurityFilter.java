@@ -1,15 +1,13 @@
 package br.com.biblioteca.infrastructure.security;
 
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.exceptions.NotFoundException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,7 +34,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             String email = jwtConfig.extractEmail(token);
 
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
+                    .orElseThrow(() -> new NotFoundException("User not found"));
 
             var authorities = Collections.singletonList(
                     new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));

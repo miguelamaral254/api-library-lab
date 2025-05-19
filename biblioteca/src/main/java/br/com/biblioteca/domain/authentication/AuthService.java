@@ -1,9 +1,8 @@
 package br.com.biblioteca.domain.authentication;
 
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.exceptions.UnauthorizedException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.infrastructure.security.JwtConfig;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,14 +20,14 @@ public class AuthService {
     @Transactional
     public User authenticateUser(String email, String password) {
         if (email == null || password == null) {
-            throw new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH);
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH));
+                .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BusinessException(UserExceptionCodeEnum.EMAIL_AND_PASSWORD_DOES_NOT_MATCH);
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         return user;

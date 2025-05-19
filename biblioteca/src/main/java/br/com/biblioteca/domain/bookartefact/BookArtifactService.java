@@ -1,15 +1,13 @@
 package br.com.biblioteca.domain.bookartefact;
 
-import br.com.biblioteca.core.BusinessException;
 import br.com.biblioteca.domain.book.Book;
 import br.com.biblioteca.domain.book.BookRepository;
-import br.com.biblioteca.domain.book.BookExceptionCodeEnum;
+import br.com.biblioteca.domain.exceptions.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 public class BookArtifactService {
@@ -32,13 +30,13 @@ public class BookArtifactService {
 
     private Book validateBusinessRules(Long bookId) {
         return bookRepository.findById(bookId)
-                .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("Book not found"));
     }
 
     @Transactional(readOnly = true)
     public BookArtifact getById(Long id) {
         return bookArtifactRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(BookArtifactExceptionCodeEnum.ARTIFACT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("Artifact not found"));
     }
 
     @Transactional(readOnly = true)

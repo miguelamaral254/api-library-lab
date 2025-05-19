@@ -1,8 +1,6 @@
 package br.com.biblioteca.domain.user;
 
-
 import br.com.biblioteca.core.ApplicationResponse;
-import br.com.biblioteca.validations.groups.CreateValidation;
 import br.com.biblioteca.validations.groups.UpdateValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,8 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-
 import java.io.IOException;
 import java.net.URI;
 
@@ -145,4 +141,3 @@ public class UserController {
     }
 
 }
-

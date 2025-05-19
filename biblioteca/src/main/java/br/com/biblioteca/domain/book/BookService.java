@@ -1,13 +1,13 @@
 package br.com.biblioteca.domain.book;
 
-import br.com.biblioteca.core.BusinessException;
+import br.com.biblioteca.domain.exceptions.InvalidException;
+import br.com.biblioteca.domain.exceptions.NotFoundException;
+import br.com.biblioteca.domain.exceptions.ServerException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.domain.user.enums.UserExceptionCodeEnum;
 import br.com.biblioteca.infrastructure.conf.ImageConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,21 +37,21 @@ public class BookService {
 
     private void validateBusinessRules(Book book) {
         if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_TITLE);
+            throw new InvalidException("Book title is required");
         }
 
         if (book.getUserId() == null || book.getUserId().getId() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
+            throw new InvalidException("User id is required");
         }
 
         if (book.getGender() == null || !Stream.of(Gender.values()).anyMatch(g -> g == book.getGender())) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+            throw new InvalidException("Gender is required");
         }
 
 
 
         User user = userRepository.findById(book.getUserId().getId())
-                .orElseThrow(() -> new BusinessException(UserExceptionCodeEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         book.setUserId(user);
     }
@@ -65,18 +65,16 @@ public class BookService {
             }
 
         } catch (IOException e) {
-            throw new BusinessException(BookExceptionCodeEnum.IMAGE_CREATION_FAILED);
+            throw new ServerException("Problem with image creation");
         }
     }
 
-    @Cacheable(value = "books", key = "#id")
     @Transactional(readOnly = true)
     public Book findById(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("Book not found"));
 
     }
-
     @Transactional(readOnly = true)
     public Page<Book> searchBooks(Specification<Book> specification, Pageable pageable) {
         return bookRepository.findAll(specification, pageable);
@@ -104,27 +102,27 @@ public class BookService {
 
     private void validateUpdateBusiness(Book book) {
         if (book == null) {
-            throw new BusinessException(BookExceptionCodeEnum.BOOK_NOT_FOUND);
+            throw new NotFoundException("Book not found");
         }
 
         if (book.getAvailable() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+            throw new InvalidException("Book available required");
         }
 
         if (!book.getAvailable().equals(Boolean.TRUE) && !book.getAvailable().equals(Boolean.FALSE)) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_AVAILABILITY_STATUS);
+            throw new InvalidException("Book available required");
         }
 
         if (book.getTitle() == null || book.getTitle().isEmpty()) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_TITLE);
+            throw new InvalidException("Book title required");
         }
 
         if (book.getUserId() == null) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_USER);
+            throw new InvalidException("Book user id required");
         }
 
         if (book.getGender() == null || !Enum.valueOf(Gender.class, book.getGender().name()).equals(book.getGender())) {
-            throw new BusinessException(BookExceptionCodeEnum.INVALID_BOOK_GENDER);
+            throw new InvalidException("Book gender required");
         }
     }
 

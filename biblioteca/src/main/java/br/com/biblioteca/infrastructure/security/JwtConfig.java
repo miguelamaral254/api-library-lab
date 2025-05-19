@@ -1,7 +1,7 @@
 package br.com.biblioteca.infrastructure.security;
 
-import br.com.biblioteca.core.BusinessException;
-import br.com.biblioteca.core.GeneralExceptionCodeEnum;
+import br.com.biblioteca.domain.exceptions.InvalidException;
+import br.com.biblioteca.domain.exceptions.ServerException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +26,7 @@ public class JwtConfig {
                     .signWith(SignatureAlgorithm.HS512, secretKey)
                     .compact();
         } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.SERVER_ERROR );
+            throw new ServerException("Internal Server Error");
         }
     }
 
@@ -46,7 +46,7 @@ public class JwtConfig {
                             role.equals("ROLE_PARTNER_COMPANY")
             );
         } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.INVALID_TOKEN);
+            throw new InvalidException("Invalid Token");
         }
     }
 
@@ -58,7 +58,7 @@ public class JwtConfig {
                     .getBody()
                     .getSubject();
         } catch (Exception e) {
-            throw new BusinessException(GeneralExceptionCodeEnum.INVALID_TOKEN);
+            throw new InvalidException("Invalid Token");
         }
     }
 }
