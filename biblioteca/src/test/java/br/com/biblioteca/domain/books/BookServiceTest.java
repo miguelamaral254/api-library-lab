@@ -5,7 +5,7 @@ import br.com.biblioteca.domain.book.*;
 import br.com.biblioteca.domain.books.factories.BookFactory;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.infrastructure.conf.ImageConfig;
+import br.com.biblioteca.domain.image.ImageStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class BookServiceTest {
     private BookRepository bookRepository;
 
     @Mock
-    private ImageConfig imageConfig;
+    private ImageStorageService imageStorageService;
 
     @Mock
     private MultipartFile file;
@@ -52,14 +52,14 @@ class BookServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(bookRepository.save(book)).thenReturn(savedBook);
-        when(imageConfig.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
+        when(imageStorageService.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
 
         book.setUserId(user);
 
         Book result = bookService.createBook(book, file, request);
 
         verify(bookRepository).save(book);
-        verify(imageConfig).saveImage(file, request);
+        verify(imageStorageService).saveImage(file, request);
         verify(userRepository).findById(userId);
 
         assertNotNull(result.getId());

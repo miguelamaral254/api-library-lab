@@ -5,7 +5,7 @@ import br.com.biblioteca.domain.exceptions.NotFoundException;
 import br.com.biblioteca.domain.exceptions.ServerException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
-import br.com.biblioteca.infrastructure.conf.ImageConfig;
+import br.com.biblioteca.domain.image.ImageStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final BookMapper bookMapper;
-    private final ImageConfig imageConfig;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public Book createBook(Book book, MultipartFile file, HttpServletRequest request) {
@@ -60,7 +60,7 @@ public class BookService {
             validateBusinessRules(book);
 
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConfig.saveImage(file, request);
+                String urlImage = imageStorageService.saveImage(file, request);
                 book.setUrlImage(urlImage);
             }
 

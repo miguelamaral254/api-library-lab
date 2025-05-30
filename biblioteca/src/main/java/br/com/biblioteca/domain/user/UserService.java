@@ -7,7 +7,7 @@ import br.com.biblioteca.domain.exceptions.ServerException;
 import br.com.biblioteca.domain.user.enums.Course;
 import br.com.biblioteca.domain.user.enums.Institution;
 import br.com.biblioteca.domain.user.enums.Role;
-import br.com.biblioteca.infrastructure.conf.ImageConfig;
+import br.com.biblioteca.domain.image.ImageStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ImageConfig imageConfig;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public User createUser(User user, MultipartFile file, HttpServletRequest request) {
@@ -112,7 +112,7 @@ public class UserService {
     private void validateImageCreateRules(User user, MultipartFile file, HttpServletRequest request) {
         try {
             if (file != null && !file.isEmpty()) {
-                String urlImage = imageConfig.saveImage(file, request);
+                String urlImage = imageStorageService.saveImage(file, request);
                 user.setImageUrl(urlImage);
             }
 

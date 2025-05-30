@@ -2,7 +2,7 @@ package br.com.biblioteca.domain.user;
 
 import br.com.biblioteca.core.BaseException;
 import br.com.biblioteca.domain.user.factories.UserFactory;
-import br.com.biblioteca.infrastructure.conf.ImageConfig;
+import br.com.biblioteca.domain.image.ImageStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private ImageConfig imageConfig;
+    private ImageStorageService imageStorageService;
 
     @Mock
     private MultipartFile file;
@@ -54,7 +54,7 @@ class UserServiceTest {
         when(userRepository.existsByCpf(user.getCpf())).thenReturn(false);
         when(passwordEncoder.encode(UserFactory.DEFAULT_PASSWORD)).thenReturn(encodedPassword);
         when(userRepository.save(user)).thenReturn(savedUser);
-        when(imageConfig.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
+        when(imageStorageService.saveImage(file, request)).thenReturn("https://localhost:8080/uploads/image_url");
 
         User createdUser = userService.createUser(user, file, request);
 
@@ -62,7 +62,7 @@ class UserServiceTest {
         verify(userRepository, times(1)).existsByCpf(user.getCpf());
         verify(passwordEncoder, times(1)).encode(UserFactory.DEFAULT_PASSWORD);
         verify(userRepository, times(1)).save(user);
-        verify(imageConfig, times(1)).saveImage(file, request);
+        verify(imageStorageService, times(1)).saveImage(file, request);
 
         assertNotNull(createdUser.getId());
         assertNotNull(createdUser.getCreatedDate());
