@@ -11,7 +11,8 @@ public class RoutesConfig {
             "/auth/**",
             "/users/**",
             "/books/**",
-            "/book-artifacts/**"
+            "/book-artifacts/**",
+            "/book-rents/**"
     };
     public static final String[] USER_ROUTES = {
 

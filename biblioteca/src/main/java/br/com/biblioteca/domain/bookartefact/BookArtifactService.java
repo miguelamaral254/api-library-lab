@@ -3,22 +3,21 @@ package br.com.biblioteca.domain.bookartefact;
 import br.com.biblioteca.domain.book.Book;
 import br.com.biblioteca.domain.book.BookRepository;
 import br.com.biblioteca.domain.exceptions.NotFoundException;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@AllArgsConstructor
 @Service
 public class BookArtifactService {
 
     private final BookArtifactRepository bookArtifactRepository;
     private final BookRepository bookRepository;
 
-    public BookArtifactService(BookArtifactRepository bookArtifactRepository, BookRepository bookRepository) {
-        this.bookArtifactRepository = bookArtifactRepository;
-        this.bookRepository = bookRepository;
-    }
 
     @Transactional
     public BookArtifact createArtifact(Long bookId, BookArtifact artifact) {
