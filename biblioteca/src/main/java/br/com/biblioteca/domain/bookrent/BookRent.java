@@ -3,7 +3,6 @@ package br.com.biblioteca.domain.bookrent;
 import br.com.biblioteca.core.BaseEntity;
 import br.com.biblioteca.domain.book.Book;
 import br.com.biblioteca.domain.user.User;
-import br.com.biblioteca.domain.user.enums.Institution;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,8 +31,8 @@ public class BookRent extends BaseEntity {
     private User userId;
 
     @Column(nullable = true)
-    private LocalDateTime devolucao;
+    private LocalDateTime returnDate;
 
     @Column(nullable = false)
-    private boolean atrasado;
+    private boolean late;
 }

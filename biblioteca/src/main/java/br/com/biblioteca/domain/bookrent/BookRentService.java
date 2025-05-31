@@ -28,7 +28,7 @@ public class BookRentService {
 
         bookRent.setBookId(book);
         bookRent.setUserId(user);
-
+        //TODO: chamar updateAvailability()
         return bookRentRepository.save(bookRent);
     }
     private Book validateBook(Long bookId) {
@@ -43,6 +43,12 @@ public class BookRentService {
     @Transactional(readOnly = true)
     public Page<BookRent> searchAllBooksRents(Specification<BookRent> specification, Pageable pageable) {
         return bookRentRepository.findAll(specification, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public BookRent getBookRentById(Long id) {
+        return bookRentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("BookRent not found"));
     }
 
 }

@@ -1,8 +1,6 @@
 package br.com.biblioteca.domain.bookrent;
 
 import br.com.biblioteca.validations.groups.CreateValidation;
-import io.micrometer.common.lang.Nullable;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -20,10 +18,10 @@ public record BookRentDTO (
         Long userId,
 
         @NotBlank(groups = {CreateValidation.class})
-        LocalDateTime devolucao,
+        LocalDateTime returnDate,
 
-        @NotBlank(groups = {CreateValidation.class})
-        Boolean atrasado,
+        @NotNull(groups = {CreateValidation.class})
+        Boolean late,
 
         @Null
         Boolean enabled,

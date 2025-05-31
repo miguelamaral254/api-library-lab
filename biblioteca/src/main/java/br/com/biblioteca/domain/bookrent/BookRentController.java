@@ -52,7 +52,7 @@ public class BookRentController {
     public ResponseEntity<ApplicationResponse<Page<BookRentDTO>>> searchBookRent(
             @RequestParam(value="bookId", required = false) Long bookId,
             @RequestParam(value="userId", required = false) Long userId,
-            @RequestParam(value="atrasado", required = false) Boolean atrasado,
+            @RequestParam(value="late", required = false) Boolean late,
             Pageable pageable){
         Specification<BookRent> specification = Specification.where(null);
 
@@ -65,9 +65,9 @@ public class BookRentController {
             specification = specification.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.equal(root.get("userId").get("id"), userId));
         }
-        if (atrasado != null) {
+        if (late != null) {
             specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("atrasado"), atrasado));
+                    criteriaBuilder.equal(root.get("late"), late));
         }
         Page<BookRent> rentPage = bookRentService.searchAllBooksRents(specification, pageable);
         Page<BookRentDTO> rentDTOPage = bookRentMapper.toDto(rentPage);
@@ -77,6 +77,18 @@ public class BookRentController {
                 .body(ApplicationResponse.ofSuccess(rentDTOPage));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Search Book Rent by ID")
+    public ResponseEntity<ApplicationResponse<BookRentDTO>> findBookRentById(
+            @PathVariable Long id) {
+        BookRent rent = bookRentService.getBookRentById(id);
+        BookRentDTO bookRentDTO = bookRentMapper.toDto(rent);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApplicationResponse.ofSuccess(bookRentDTO));
+
+    }
 
 
 }

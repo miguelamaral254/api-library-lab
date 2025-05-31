@@ -52,7 +52,9 @@ public class BookFactory {
         book.setCreatedDate(now);
         book.setLastModifiedDate(now);
         return book;
-    }    public static Book savedBook(Long id, String title) {
+    }
+
+    public static Book savedBook(Long id, String title) {
         return savedBook(id, title, DEFAULT_DESCRIPTION, DEFAULT_GENDER, DEFAULT_ENABLED);
     }
 
