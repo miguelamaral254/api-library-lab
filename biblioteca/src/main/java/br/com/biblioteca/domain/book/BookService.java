@@ -3,6 +3,7 @@ package br.com.biblioteca.domain.book;
 import br.com.biblioteca.domain.exceptions.InvalidException;
 import br.com.biblioteca.domain.exceptions.NotFoundException;
 import br.com.biblioteca.domain.exceptions.ServerException;
+import br.com.biblioteca.domain.exceptions.UnauthorizedException;
 import br.com.biblioteca.domain.user.User;
 import br.com.biblioteca.domain.user.UserRepository;
 import br.com.biblioteca.domain.image.ImageStorageService;
@@ -14,7 +15,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -25,12 +25,11 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final BookMapper bookMapper;
     private final ImageStorageService imageStorageService;
 
     @Transactional
     public Book createBook(Book book, MultipartFile file, HttpServletRequest request) {
-        validateImageCreateRules(book ,file, request);
+        validateImageCreateRules(book, file, request);
 
         return bookRepository.save(book);
     }
@@ -49,12 +48,12 @@ public class BookService {
         }
 
 
-
         User user = userRepository.findById(book.getUserId().getId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         book.setUserId(user);
     }
+
     private void validateImageCreateRules(Book book, MultipartFile file, HttpServletRequest request) {
         try {
             validateBusinessRules(book);
@@ -75,6 +74,7 @@ public class BookService {
                 .orElseThrow(() -> new NotFoundException("Book not found"));
 
     }
+
     @Transactional(readOnly = true)
     public Page<Book> searchBooks(Specification<Book> specification, Pageable pageable) {
         return bookRepository.findAll(specification, pageable);
@@ -93,24 +93,22 @@ public class BookService {
     @Transactional
     public Book updateAvailability(Long id, Boolean available) {
         Book book = findById(id);
+        validateUpdateBusiness(book, available);
         book.setAvailable(available);
-
-        validateUpdateBusiness(book);
-
         return bookRepository.save(book);
     }
 
-    private void validateUpdateBusiness(Book book) {
+    private void validateUpdateBusiness(Book book, Boolean newAvailability) {
         if (book == null) {
             throw new NotFoundException("Book not found");
         }
 
         if (book.getAvailable() == null) {
-            throw new InvalidException("Book available required");
+            throw new InvalidException("Book availability status is missing");
         }
 
-        if (!book.getAvailable().equals(Boolean.TRUE) && !book.getAvailable().equals(Boolean.FALSE)) {
-            throw new InvalidException("Book available required");
+        if (book.getAvailable().equals(newAvailability)) {
+            throw new InvalidException("Book is already " + (newAvailability ? "available" : "unavailable"));
         }
 
         if (book.getTitle() == null || book.getTitle().isEmpty()) {
@@ -125,7 +123,6 @@ public class BookService {
             throw new InvalidException("Book gender required");
         }
     }
-
     @Transactional
     public void deleteBook(Long id) {
         Book book = findById(id);
