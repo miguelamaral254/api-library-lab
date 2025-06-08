@@ -68,11 +68,11 @@ public class BookRentService {
         return bookRentRepository.save(rent);
     }
 
-    public void devolucao(Long id) {
+    @Transactional
+    public void bookReturn(Long id) {
         BookRent rent = getBookRentById(id);
         bookService.updateAvailability(rent.getBookId().getId(), true);
         disableRent(id, false);
-
     }
 
 }

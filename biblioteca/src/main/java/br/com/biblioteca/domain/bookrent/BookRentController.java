@@ -93,8 +93,8 @@ public class BookRentController {
     @Tag(name = "Devolver livro")
     @Operation(summary = "Devolver livro by ID")
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> devolucao(@PathVariable Long id) {
-        bookRentService.devolucao(id);
+    public ResponseEntity<Void> bookReturn(@PathVariable Long id) {
+        bookRentService.bookReturn(id);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
