@@ -19,7 +19,6 @@ public interface BookRentMapper extends BaseMapper<BookRent, BookRentDTO> {
     @Mapping(source = "userId", target = "userId")
     BookRent toEntity(BookRentDTO bookRentDto);
 
-    // Book mapping helpers
     default Long map(Book book) {
         return book != null ? book.getId() : null;
     }
@@ -31,7 +30,6 @@ public interface BookRentMapper extends BaseMapper<BookRent, BookRentDTO> {
         return book;
     }
 
-    // User mapping helpers
     default Long map(User user) {
         return user != null ? user.getId() : null;
     }
